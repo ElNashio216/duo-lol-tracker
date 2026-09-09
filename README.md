@@ -1,1 +1,3 @@
-# duo-lol-tracker
+This is a personal Discord bot developed for a small, private Discord server (2 users). The bot automatically tracks League of Legends matches played by its members and posts an embed to a Discord channel after each game, showing champion played, result (win/loss), KDA, match duration, and rank changes over time. It also offers on-demand slash commands (e.g. /stats, /vs) for querying historical match data between the two linked accounts.
+
+APIs used: Match-V5 (to detect and retrieve new matches), Summoner-V4 and League-V4 (to link Riot accounts and track rank). The bot polls for new matches every few minutes for only 2 linked summoners, so expected request volume is very low. This is a non-commercial, self-hosted project for personal use — it is not distributed publicly, does not organize tournaments, and is not monetized in any way.
