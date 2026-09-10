@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  duo-lol-tracker:
+    build: .
+    container_name: duo-lol-tracker
+    restart: unless-stopped
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - RIOT_API_KEY=${RIOT_API_KEY}
+      - CHANNEL_ID=${CHANNEL_ID}
+      - REGION=americas
+      - PLATFORM=la2
+      - POLL_INTERVAL_MINUTES=5
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
