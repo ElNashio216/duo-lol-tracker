@@ -14,4 +14,3 @@ services:
       - POLL_INTERVAL_MINUTES=5
     volumes:
       - ./data:/app/data
-      - ./config:/app/config
