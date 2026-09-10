@@ -44,9 +44,16 @@ async function pollOnce(client) {
     }
   }
 
-  // 3. Traer el detalle de cada partida nueva y ordenarlas cronológicamente
+  // 3. Solo nos interesan las partidas jugadas en dúo (2+ cuentas vinculadas
+  //    en la misma partida). Las partidas en solitario se marcan como vistas
+  //    pero NO se postean ni se les pide el detalle completo (ahorra llamadas
+  //    a la API).
   const matchesToProcess = [];
   for (const [matchId, labelsSet] of candidateMatches.entries()) {
+    if (labelsSet.size < 2) {
+      db.markMatchPosted(matchId);
+      continue;
+    }
     try {
       const matchData = await riot.getMatchById(matchId);
       matchesToProcess.push({ matchId, labelsSet, matchData });
@@ -58,7 +65,7 @@ async function pollOnce(client) {
     (a, b) => a.matchData.info.gameStartTimestamp - b.matchData.info.gameStartTimestamp
   );
 
-  // 4. Postear cada partida nueva
+  // 4. Postear cada partida en dúo nueva
   for (const { matchId, labelsSet, matchData } of matchesToProcess) {
     await processMatch({ matchId, labelsSet, matchData, channel });
     db.markMatchPosted(matchId);
@@ -102,13 +109,15 @@ async function processMatch({ matchId, labelsSet, matchData, channel }) {
     });
   }
 
-  if (participantsInfo.length === 0) return;
+  if (participantsInfo.length < 2) return; // por las dudas, no debería pasar acá
 
   const embed = buildMatchEmbed({
     matchId,
     gameDurationMinutes: Math.round(matchData.info.gameDuration / 60),
     participants: participantsInfo,
     teamWin,
+    queueId: matchData.info.queueId,
+    gameStartTimestamp: matchData.info.gameStartTimestamp,
   });
 
   await channel.send({ embeds: [embed] });
